@@ -33,6 +33,6 @@ Paths are set in `config/paths.py`.
 ## Acknowledgements
 
 This study has been conducted using E.U. Copernicus Marine Service Information.
-We acknowledge the World Climate Research Programme, which through its Working
+I acknowledge the World Climate Research Programme, which through its Working
 Group on Coupled Modelling coordinated CMIP6, and thank the climate modelling
 groups, the Earth System Grid Federation, and the agencies supporting CMIP6.
