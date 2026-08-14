@@ -39,7 +39,7 @@ Each script sets DATA_DIR at the top. Point it at the folder holding the downloa
 | `b08` | Figure 10, Table 11 |
 | `b09` | Figure 11, Table 12 |
 | `b10` | Inundation masks used in Figures 15–17 |
-| `b11` | Figure 12,13 |
+| `b11` | Figure 12, 13 |
 | `b12` | Figure 14 |
 
 The per-habitat flooded percentages in Table B1 were computed in QGIS by
