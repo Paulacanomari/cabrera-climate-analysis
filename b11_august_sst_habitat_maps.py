@@ -4,9 +4,7 @@
 # NO contour lines, NO interpolation. Diverging colour centered on 28 C.
 # =========================================================
 
-import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 import xarray as xr
 import matplotlib.pyplot as plt
@@ -18,19 +16,25 @@ from shapely.geometry import box, Point
 from shapely.ops import polygonize
 from matplotlib.patches import Patch
 
-from config.paths import (
-    CMEMS_SST_DIR, COSTA_DIR, SST_HABITATS_FIGURES_DIR
-)
+# =========================================================
+# PATHS
+# Set DATA_DIR to the folder holding the downloaded datasets.
+# See the README for the products and where to obtain them.
+# =========================================================
 
-OUTPUT_DIR = SST_HABITATS_FIGURES_DIR
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("figures")
+
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-FILE_CMEMS = (
-    CMEMS_SST_DIR /
-    "cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021_1777296864009.nc"
-)
-PATH_COAST = COSTA_DIR / "COSTA.shp"
-PATH_HABITATS = COSTA_DIR / "cabrera_habitat" / "marine_habitats.shp"
+# CMEMS L4 reprocessed SST, Mediterranean Sea (product 010_021)
+FILE_CMEMS = DATA_DIR / "cmems_sst_med_l4_rep.nc"
+
+# Linea de Costa, Instituto Hidrografico de la Marina
+PATH_COAST = DATA_DIR / "shapefiles" / "COSTA.shp"
+
+# EUSeaMap 2025 marine habitats, EMODnet Seabed Habitats
+PATH_HABITATS = DATA_DIR / "shapefiles" / "marine_habitats.shp"
 
 # =========================================================
 # PARAMETERS
