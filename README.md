@@ -34,13 +34,13 @@ Paths are set in `config/paths.py`.
 
 | Script | Produces |
 |---|---|
-| `b06` | Figure 7 |
+| `b06` | Figure 7, Table 10 |
 | `b07` | Figures 8, 9 |
 | `b08` | Figure 10, Table 11 |
 | `b09` | Figure 11, Table 12 |
-| `b10` | Figures 12, 13 |
-| `b11` | Figure 14 |
-| `b12` | Inundation masks used in Figures 15–17 |
+| `b10` | Inundation masks used in Figures 15–17 |
+| `b11` | Figure 12,13 |
+| `b12` | Figure 14 |
 
 The per-habitat flooded percentages in Table B1 were computed in QGIS by
 intersecting the habitat polygons with the masks from `b12`. That step is not
