@@ -74,7 +74,7 @@ COLORS = {
 }
 
 # ---------------------------------------------------------
-# TEXT SIZES (adjust here if anything is still too small)
+# TEXT SIZES 
 # ---------------------------------------------------------
 FS_TICKS = 14  # axis tick numbers
 FS_YLABEL = 15  # y-axis label
