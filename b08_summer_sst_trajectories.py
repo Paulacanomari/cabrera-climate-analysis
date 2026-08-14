@@ -3,12 +3,7 @@
 # Summer (JJA) Regression & Climate Evolution
 # =========================================================
 
-import sys
 from pathlib import Path
-
-sys.path.append(
-    str(Path(__file__).resolve().parents[3])
-)
 
 import xarray as xr
 import matplotlib.pyplot as plt
@@ -17,71 +12,45 @@ import pandas as pd
 
 # =========================================================
 # 1. PATHS
+# Set DATA_DIR to the folder holding the downloaded datasets.
+# See the README for the products and where to obtain them.
 # =========================================================
 
-from config.paths import (
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("figures")
 
-    CMEMS_SST_DIR,
+# CMEMS L4 reprocessed SST, Mediterranean Sea (product 010_021)
+FILE_CMEMS = DATA_DIR / "cmems_sst_med_l4_rep.nc"
 
-    CMIP6_HISTORICAL_FILE,
+# CMIP6 CNRM-CM6-1-HR, variable tos, historical run
+FILE_HIST = DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_historical_r1i1p1f2_gn.nc"
 
-    CMIP6_SST_GAP_DIR,
-
-    SST_CMEMS_FIGURES_DIR
-
-)
-
-# =========================================================
-# CMEMS OBSERVATIONS
-# =========================================================
-
-FILE_CMEMS = (
-
-    CMEMS_SST_DIR /
-
-    "cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021_1777296864009.nc"
-
-)
-
-# =========================================================
-# HISTORICAL MODEL
-# =========================================================
-
-FILE_HIST = CMIP6_HISTORICAL_FILE
-
-# =========================================================
-# FUTURE SCENARIOS
-# =========================================================
-
-BASE_FOLDER = CMIP6_SST_GAP_DIR
-
+# CMIP6 CNRM-CM6-1-HR, variable tos, scenario runs 2015-2100
 FILES_FUT = {
 
     "SSP1-2.6":
 
-    BASE_FOLDER /
+    DATA_DIR /
 
-    "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn_20150116-21001216.nc",
+    "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn.nc",
 
     "SSP2-4.5":
 
-    BASE_FOLDER /
+    DATA_DIR /
 
-    "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn_20150116-21001216.nc",
+    "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn.nc",
 
     "SSP5-8.5":
 
-    BASE_FOLDER /
+    DATA_DIR /
 
-    "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn_20150116-21001216.nc",
+    "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn.nc",
 
 }
 
 # =========================================================
 # OUTPUT
 # =========================================================
-
-OUTPUT_DIR = SST_CMEMS_FIGURES_DIR
 
 OUTPUT_DIR.mkdir(
     parents=True,
@@ -110,6 +79,15 @@ SUMMER_MONTHS = [6, 7, 8]  # June, July, August
 
 OBS_START_YEAR = 1982
 OBS_END_YEAR = 2025
+
+# ---------------------------------------------------------
+# PERIODS USED FOR TABLE 11
+# ---------------------------------------------------------
+
+PERIODS = {
+    "Mid (2041-2060)": (2041, 2060),
+    "End (2081-2100)": (2081, 2100),
+}
 
 # X-axis tick marks. Start at the beginning of the observed record so the
 # early years are labelled, rather than leaving the left of the axis blank.
@@ -323,6 +301,9 @@ plt.subplots_adjust(
 data_min = np.inf
 data_max = -np.inf
 
+# collects the period means reported in Table 11
+table_rows = []
+
 # =========================================================
 # 8. LOOP FUTURE SCENARIOS
 # =========================================================
@@ -356,6 +337,22 @@ for ax, (scenario, file_fut) in zip(
         fut_corrected.year >= LAST_CMEMS_YEAR,
         drop=True
     )
+
+    # =====================================================
+    # PERIOD MEANS FOR TABLE 11
+    # =====================================================
+
+    row = {"IPCC scenario": scenario}
+
+    for label, (y0, y1) in PERIODS.items():
+
+        window = fut_corrected.sel(year=slice(y0, y1))
+        value = float(window.mean())
+
+        row[label] = round(value, 2)
+        row[f"{label.split(' ')[0]} delta"] = round(value - obs_baseline, 2)
+
+    table_rows.append(row)
 
     # =====================================================
     # SMOOTH & TREND
@@ -598,5 +595,24 @@ print(f"\n>>> Figure saved:")
 print(output_file)
 
 plt.close()
+
+# =========================================================
+# 12. TABLE 11
+# =========================================================
+
+table = pd.DataFrame(table_rows)[[
+    "IPCC scenario",
+    "Mid (2041-2060)", "Mid delta",
+    "End (2081-2100)", "End delta",
+]]
+
+print("\n" + "=" * 78)
+print(
+    f"TABLE 11 - Summer (JJA) mean SST (degC). "
+    f"Observed baseline 1995-2014 = {obs_baseline:.2f} degC"
+)
+print("=" * 78)
+print(table.to_string(index=False))
+print("=" * 78)
 
 print("\n>>> Summer SST regression trajectories generated successfully.")
