@@ -30,6 +30,22 @@ No data is included. All datasets are openly available:
 
 Paths are set in `config/paths.py`.
 
+## Scripts
+
+| Script | Produces |
+|---|---|
+| `b06` | Figure 7 |
+| `b07` | Figures 8, 9 |
+| `b08` | Figure 10, Table 11 |
+| `b09` | Figure 11, Table 12 |
+| `b10` | Figures 12, 13 |
+| `b11` | Figure 14 |
+| `b12` | Inundation masks used in Figures 15–17 |
+
+The per-habitat flooded percentages in Table B1 were computed in QGIS by
+intersecting the habitat polygons with the masks from `b12`. That step is not
+scripted.
+
 ## Acknowledgements
 
 This study has been conducted using E.U. Copernicus Marine Service Information.
