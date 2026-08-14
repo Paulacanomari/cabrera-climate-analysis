@@ -1,15 +1,9 @@
 # =========================================================
 # CABRERA SEA LEVEL RISE PROJECTIONS
 # IPCC AR6 - Medium Confidence
-# Saved to figures/SLR/projections
 # =========================================================
 
-import sys
 from pathlib import Path
-
-sys.path.append(
-    str(Path(__file__).resolve().parents[3])
-)
 
 import xarray as xr
 import numpy as np
@@ -18,23 +12,23 @@ import matplotlib.pyplot as plt
 
 # =========================================================
 # 1. PATHS
+# Set DATA_DIR to the folder holding the downloaded datasets.
+# See the README for the products and where to obtain them.
 # =========================================================
 
-from config.paths import (
-
-    AR6_DIR,
-
-    SLR_PROJECTIONS_FIGURES_DIR
-
-)
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("figures")
 
 # =========================================================
 # AR6 MEDIUM CONFIDENCE
+# Directory structure as published in the AR6 sea level archive
 # =========================================================
 
 DATA_PATH = (
 
-    AR6_DIR /
+    DATA_DIR /
+
+    "ar6" /
 
     "regional" /
 
@@ -47,8 +41,6 @@ DATA_PATH = (
 # =========================================================
 # OUTPUT DIRECTORY
 # =========================================================
-
-OUTPUT_DIR = SLR_PROJECTIONS_FIGURES_DIR
 
 OUTPUT_DIR.mkdir(
     parents=True,
