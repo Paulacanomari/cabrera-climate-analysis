@@ -28,7 +28,7 @@ No data is included. All datasets are openly available:
   Govern de les Illes Balears.
 - **Coastline** — Línea de Costa, © Instituto Hidrográfico de la Marina.
 
-Paths are set in `config/paths.py`.
+Each script sets DATA_DIR at the top. Point it at the folder holding the downloaded files.
 
 ## Scripts
 
