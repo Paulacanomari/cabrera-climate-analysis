@@ -4,10 +4,7 @@
 # With mortality threshold (28 C)
 # =========================================================
 
-import sys
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 import xarray as xr
 import matplotlib.pyplot as plt
@@ -16,29 +13,26 @@ import pandas as pd
 
 # =========================================================
 # 1. PATHS
+# Set DATA_DIR to the folder holding the downloaded datasets.
+# See the README for the products and where to obtain them.
 # =========================================================
 
-from config.paths import (
-    CMEMS_SST_DIR,
-    CMIP6_HISTORICAL_FILE,
-    CMIP6_SST_GAP_DIR,
-    SST_CMEMS_FIGURES_DIR
-)
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("figures")
 
-FILE_CMEMS = (
-    CMEMS_SST_DIR /
-    "cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021_1777296864009.nc"
-)
-FILE_HIST = CMIP6_HISTORICAL_FILE
-BASE_FOLDER = CMIP6_SST_GAP_DIR
+# CMEMS L4 reprocessed SST, Mediterranean Sea (product 010_021)
+FILE_CMEMS = DATA_DIR / "cmems_sst_med_l4_rep.nc"
 
+# CMIP6 CNRM-CM6-1-HR, variable tos, historical run
+FILE_HIST = DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_historical_r1i1p1f2_gn.nc"
+
+# CMIP6 CNRM-CM6-1-HR, variable tos, scenario runs 2015-2100
 FILES_FUT = {
-    "SSP1-2.6": BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn_20150116-21001216.nc",
-    "SSP2-4.5": BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn_20150116-21001216.nc",
-    "SSP5-8.5": BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn_20150116-21001216.nc",
+    "SSP1-2.6": DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn.nc",
+    "SSP2-4.5": DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn.nc",
+    "SSP5-8.5": DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn.nc",
 }
 
-OUTPUT_DIR = SST_CMEMS_FIGURES_DIR
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 output_file = (
