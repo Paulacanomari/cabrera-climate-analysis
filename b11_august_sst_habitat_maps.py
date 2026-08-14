@@ -1,7 +1,7 @@
 # =========================================================
 # POSIDONIA + FUTURE SST HABITAT MAPS  --  AUGUST
 # Clean version: coloured SST cells + habitats only.
-# NO contour lines, NO interpolation. Diverging colour centered on 28 C.
+# Diverging colour centered on 28 C.
 # =========================================================
 
 from pathlib import Path
