@@ -43,7 +43,7 @@ Paths are set in `config/paths.py`.
 | `b12` | Figure 14 |
 
 The per-habitat flooded percentages in Table B1 were computed in QGIS by
-intersecting the habitat polygons with the masks from `b12`. That step is not
+intersecting the habitat polygons with the masks from `b10`. That step is not
 scripted.
 
 ## Acknowledgements
