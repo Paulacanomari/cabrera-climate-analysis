@@ -2,10 +2,7 @@
 # CABRERA SST CLIMATE TRAJECTORIES
 # Monthly Regression & Continuous Climate Evolution
 # =========================================================
-import sys
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 import xarray as xr
 import matplotlib.pyplot as plt
@@ -15,47 +12,30 @@ import pandas as pd
 
 # =========================================================
 # 1. PATHS
+# Set DATA_DIR to the folder holding the downloaded datasets.
+# See the README for the products and where to obtain them.
 # =========================================================
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("figures")
 
-from config.paths import (
-    CMEMS_SST_DIR,
-    CMIP6_HISTORICAL_FILE,
-    CMIP6_SST_GAP_DIR,
-    SST_CMEMS_FIGURES_DIR
-)
+# CMEMS L4 reprocessed SST, Mediterranean Sea (product 010_021)
+FILE_CMEMS = DATA_DIR / "cmems_sst_med_l4_rep.nc"
 
-# =========================================================
-# CMEMS OBSERVATIONS
-# =========================================================
-FILE_CMEMS = (
-    CMEMS_SST_DIR /
-    "cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021_1777296864009.nc"
-)
+# CMIP6 CNRM-CM6-1-HR, variable tos, historical run
+FILE_HIST = DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_historical_r1i1p1f2_gn.nc"
 
-# =========================================================
-# HISTORICAL MODEL
-# =========================================================
-FILE_HIST = CMIP6_HISTORICAL_FILE
-
-# =========================================================
-# FUTURE SCENARIOS
-# =========================================================
-BASE_FOLDER = CMIP6_SST_GAP_DIR
+# CMIP6 CNRM-CM6-1-HR, variable tos, scenario runs 2015-2100
 FILES_FUT = {
-    "SSP1-2.6": BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn_20150116-21001216.nc",
-    "SSP2-4.5": BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn_20150116-21001216.nc",
-    "SSP5-8.5": BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn_20150116-21001216.nc",
+    "SSP1-2.6": DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn.nc",
+    "SSP2-4.5": DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn.nc",
+    "SSP5-8.5": DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn.nc",
 }
 
 # =========================================================
 # OUTPUT
 # =========================================================
-OUTPUT_DIR = SST_CMEMS_FIGURES_DIR
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-output_file = (
-    OUTPUT_DIR /
-    "Cabrera_Monthly_Regression_SST_continuous.png"
-)
+output_file = OUTPUT_DIR / "Cabrera_Monthly_Regression_SST_continuous.png"
 
 # =========================================================
 # 2. PARAMETERS
@@ -64,7 +44,7 @@ LAT_MIN, LAT_MAX = 38.8, 39.6
 LON_MIN, LON_MAX = 2.4, 3.6
 BASELINE_START = "1995-01-01"
 BASELINE_END = "2014-12-31"
-# Observed record clipped to complete years (matches standalone observed figure)
+# Observed record clipped to complete years
 OBS_START = "1982-01-01"
 OBS_END = "2025-12-31"
 COLORS = {
@@ -74,7 +54,15 @@ COLORS = {
 }
 
 # ---------------------------------------------------------
-# TEXT SIZES 
+# PERIODS USED FOR TABLE 10
+# ---------------------------------------------------------
+PERIODS = {
+    "Mid (2041-2060)": ("2041-01-01", "2060-12-31"),
+    "End (2081-2100)": ("2081-01-01", "2100-12-31"),
+}
+
+# ---------------------------------------------------------
+# TEXT SIZES
 # ---------------------------------------------------------
 FS_TICKS = 14  # axis tick numbers
 FS_YLABEL = 15  # y-axis label
@@ -98,7 +86,6 @@ XTICK_STEP = 10
 
 # ---------------------------------------------------------
 # BACKGROUND (RAW MONTHLY) LINE STYLE
-# raised from alpha 0.15/0.20 so the variability is visible
 # ---------------------------------------------------------
 BG_ALPHA_OBS = 0.45
 BG_ALPHA_FUT = 0.45
@@ -237,6 +224,10 @@ plt.subplots_adjust(
 data_min = np.inf
 data_max = -np.inf
 
+# collects the period means reported in Table 10
+table_rows = []
+baseline_annual = float(obs_clim.mean())
+
 # =========================================================
 # 8. LOOP FUTURE SCENARIOS
 # =========================================================
@@ -249,6 +240,16 @@ for ax, (scenario, file_fut) in zip(axes, FILES_FUT.items()):
     fut_corrected = fut_anomaly.groupby("time.month") + obs_clim
     # FILTER AFTER CMEMS
     fut_corrected = fut_corrected.sel(time=slice(LAST_CMEMS_DATE, None))
+
+    # PERIOD MEANS FOR TABLE 10
+    row = {"IPCC scenario": scenario}
+    for label, (start, end) in PERIODS.items():
+        window = fut_corrected.sel(time=slice(start, end))
+        value = float(window.mean())
+        row[label] = round(value, 2)
+        row[f"{label.split(' ')[0]} delta"] = round(value - baseline_annual, 2)
+    table_rows.append(row)
+
     # SMOOTH & TREND
     fut_smooth = fut_corrected.rolling(time=12, center=True).mean()
     fut_t, fut_trend, fut_dec_trend = calculate_trend(
@@ -369,4 +370,23 @@ plt.savefig(output_file, dpi=300, bbox_inches="tight")
 print(f"\n>>> Figure saved:")
 print(output_file)
 plt.close()
+
+# =========================================================
+# 12. TABLE 10
+# =========================================================
+table = pd.DataFrame(table_rows)[[
+    "IPCC scenario",
+    "Mid (2041-2060)", "Mid delta",
+    "End (2081-2100)", "End delta",
+]]
+
+print("\n" + "=" * 78)
+print(
+    f"TABLE 10 - Annual mean SST (degC). "
+    f"Observed baseline 1995-2014 = {baseline_annual:.2f} degC"
+)
+print("=" * 78)
+print(table.to_string(index=False))
+print("=" * 78)
+
 print("\n>>> Monthly SST regression trajectories generated successfully.")
