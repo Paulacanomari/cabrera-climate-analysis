@@ -1,15 +1,9 @@
 # =========================================================
 # CABRERA ANNUAL SST PROJECTIONS ANALYSIS
 # Seasonal cycle delta-corrected onto CMEMS baseline (per month)
-# Saved to figures/SST/projections
 # =========================================================
 
-import sys
 from pathlib import Path
-
-sys.path.append(
-    str(Path(__file__).resolve().parents[3])
-)
 
 import xarray as xr
 import pandas as pd
@@ -19,50 +13,31 @@ import numpy as np
 
 # =========================================================
 # 1. PATHS
+# Set DATA_DIR to the folder holding the downloaded datasets.
+# See the README for the products and where to obtain them.
 # =========================================================
+DATA_DIR = Path("data")
+FIG_DIR = Path("figures")
 
-from config.paths import (
-    CMIP6_HISTORICAL_FILE,
-    CMIP6_SST_DIR,
-    CMEMS_SST_DIR,
-    SST_PROJECTIONS_FIGURES_DIR
-)
+# CMIP6 CNRM-CM6-1-HR, variable tos, historical run
+FILE_HIST = DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_historical_r1i1p1f2_gn.nc"
 
-# =========================================================
-# HISTORICAL
-# =========================================================
+# CMEMS L4 reprocessed SST, Mediterranean Sea (product 010_021)
+FILE_CMEMS = DATA_DIR / "cmems_sst_med_l4_rep.nc"
 
-FILE_HIST = CMIP6_HISTORICAL_FILE
-
-# =========================================================
-# CMEMS OBSERVATIONS
-# =========================================================
-
-FILE_CMEMS = (
-    CMEMS_SST_DIR /
-    "cmems_SST_MED_SST_L4_REP_OBSERVATIONS_010_021_1777296864009.nc"
-)
-
-# =========================================================
-# SST PROJECTIONS
-# =========================================================
-
-BASE_FOLDER = CMIP6_SST_DIR
-
+# CMIP6 CNRM-CM6-1-HR, variable tos, 20-year scenario windows
 FILES_FUT = {
-    ("ssp126", "mid"): BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn_20400116-20601216.nc",
-    ("ssp126", "end"): BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn_20800116-21001216.nc",
-    ("ssp245", "mid"): BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn_20400116-20601216.nc",
-    ("ssp245", "end"): BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn_20800116-21001216.nc",
-    ("ssp585", "mid"): BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn_20400116-20601216.nc",
-    ("ssp585", "end"): BASE_FOLDER / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn_20800116-21001216.nc",
+    ("ssp126", "mid"): DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn_2040-2060.nc",
+    ("ssp126", "end"): DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp126_r1i1p1f2_gn_2080-2100.nc",
+    ("ssp245", "mid"): DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn_2040-2060.nc",
+    ("ssp245", "end"): DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp245_r1i1p1f2_gn_2080-2100.nc",
+    ("ssp585", "mid"): DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn_2040-2060.nc",
+    ("ssp585", "end"): DATA_DIR / "tos_Omon_CNRM-CM6-1-HR_ssp585_r1i1p1f2_gn_2080-2100.nc",
 }
 
 # =========================================================
 # FIGURES
 # =========================================================
-
-FIG_DIR = SST_PROJECTIONS_FIGURES_DIR
 
 FIG_DIR.mkdir(
     parents=True,
