@@ -4,20 +4,24 @@
 # Export GeoTIFFs aligned to EPSG:25831
 # =========================================================
 
+from pathlib import Path
+
 import rasterio
 import numpy as np
 
 # =========================================================
 # 1. PATHS
+# Set DATA_DIR to the folder holding the downloaded datasets.
+# See the README for the products and where to obtain them.
 # =========================================================
 
-DEM_PATH = (
-    "/Users/paulacano/Desktop/Marine Data/data/shapefiles/cabrera_dem_2m.tif"
-)
+DATA_DIR = Path("data")
+OUTPUT_DIR = Path("output")
 
-OUTPUT_DIR = (
-    "/Users/paulacano/Desktop/Marine Data/data/shapefiles/"
-)
+# MDT02 LiDAR digital terrain model, 2 m, ETRS89 / UTM zone 31N
+DEM_PATH = DATA_DIR / "cabrera_dem_2m.tif"
+
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # =========================================================
 # 2. SLR SCENARIOS (meters)
@@ -115,7 +119,11 @@ for scenario, slr in SCENARIOS.items():
     # CREATE FLOOD MASK
     # =====================================================
     # Flooded if:
-    # 0.2 m < elevation <= SLR
+    # 0 m < elevation <= SLR
+    #
+    # Static bathtub model: hydrological connectivity is not
+    # considered, so isolated inland depressions below the
+    # projected sea level are also flagged.
     # =====================================================
 
     flooded = (
@@ -147,9 +155,7 @@ for scenario, slr in SCENARIOS.items():
     # OUTPUT FILE
     # =====================================================
 
-    output_path = (
-        f"{OUTPUT_DIR}/flood_{scenario}.tif"
-    )
+    output_path = OUTPUT_DIR / f"flood_{scenario}.tif"
 
     # =====================================================
     # EXPORT FLOOD MASK
